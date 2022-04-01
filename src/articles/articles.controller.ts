@@ -16,6 +16,11 @@ export class ArticlesController {
         return this.articlesService.findOne(id)
     }
 
+    @Get('/users/:id')
+    findByUser(@Param('id', ParseIntPipe) id: number) {
+        return this.articlesService.findByUser(id)
+    }
+
     @Post()
     create(@Body() article: CreateArticleDto) {
         return this.articlesService.create(article)

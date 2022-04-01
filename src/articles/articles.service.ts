@@ -19,15 +19,21 @@ export class ArticlesService {
         return article;
     }
 
+    async findByUser(id: number): Promise<Article[]> {
+        const articles = await this.articleRepository.find({ where: { author_id: id } });
+        return articles;
+    }
+
     async create(artcile: CreateArticleDto): Promise<Article> {
         const article = this.articleRepository.create(artcile);
         return await this.articleRepository.save(article);
     }
 
     async update(id: number, article: CreateArticleDto) {
-        const articleDb = await this.articleRepository.findOne({ where: { id } });
+        let articleDb = await this.articleRepository.findOne({ where: { id } });
+        articleDb = { ...articleDb, ...article };
         if (!articleDb) throw new NotFoundException('Article not found');
-        await this.articleRepository.save(article);
+        await this.articleRepository.save(articleDb);
     }
 
     async remove(id: number) {
