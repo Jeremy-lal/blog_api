@@ -8,12 +8,12 @@ import Article from '../typeorm/Article';
 export class ArticlesService {
     constructor(@InjectRepository(Article) private readonly articleRepository: Repository<Article>) { }
 
-    findAll(): Promise<Article[]> {
+    findAll() {
         return this.articleRepository.find();
     }
 
-    findOne(id: number): Promise<Article> {
-        const article = this.articleRepository.findOne({ where: { id } });
+    async findOne(id: number): Promise<Article> {
+        const article = await this.articleRepository.findOne({ where: { id } });
 
         if (!article) throw new NotFoundException('Article not found');
         return article;
