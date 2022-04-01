@@ -22,4 +22,13 @@ export class UsersService {
         return this.userRepository.find({ where: { username } });
     }
 
+    async remove(id: number) {
+        const user = await this.findOne(id)
+        if (!user) {
+            throw new NotFoundException('user not found')
+        }
+
+        return this.userRepository.remove(user);
+    }
+
 }
