@@ -22,14 +22,14 @@ export class AuthService {
         return tokens;
     }
 
-    async signinLocal(createUserDto: CreateUserDto): Promise<Tokens> {
-        const user = await this.userRepository.findOne({ where: { username: createUserDto.username } })
+    async signinLocal(userForm: { username: string, password: string }): Promise<{ tokens: Tokens, user: User }> {
+        const user = await this.userRepository.findOne({ where: { username: userForm.username } })
 
         if (!user) {
             throw new ForbiddenException('Invalid credentials');
         }
 
-        const passwordMatch = await verify(user.password, createUserDto.password);
+        const passwordMatch = await verify(user.password, userForm.password);
 
         if (!passwordMatch) {
             throw new ForbiddenException('Invalid credentials');
@@ -37,7 +37,10 @@ export class AuthService {
 
         const tokens = await this.getTokens(user.id, user.username);
         this.updateRtHash(user.id, tokens.refresh_token);
-        return tokens;
+
+        delete user.password;
+        delete user.hashedRt
+        return { tokens, user };
     }
 
     async logout(userId: number) {
@@ -69,7 +72,7 @@ export class AuthService {
 
         const tokens = await this.getTokens(user.id, user.username);
         this.updateRtHash(user.id, tokens.refresh_token);
-        return tokens;
+        return tokens.access_token;
     }
 
     async updateRtHash(userId: number, rtHash: string) {
